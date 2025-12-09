@@ -30,6 +30,7 @@ async def main():
     parser.add_argument("--limit", type=int, default=10, help="Number of recent papers to check")
     parser.add_argument("--headless", action="store_true", help="Run in headless mode (default: False for visibility)")
     parser.add_argument("--output", default="endorsers_report.json", help="Output JSON file")
+    parser.add_argument("--delay", type=int, default=30, help="Delay in seconds between paper checks (default: 30)")
     
     args = parser.parse_args()
     
@@ -57,15 +58,63 @@ async def main():
         print("No papers found.")
         return 0
 
+    # 2.5. Load existing results and filter out already-checked papers
+    existing_results = []
+    already_checked = set()
+    
+    if Path(args.output).exists():
+        try:
+            with open(args.output, 'r') as f:
+                existing_data = json.load(f)
+                existing_results = existing_data.get('results', [])
+                already_checked = {r['arxiv_id'] for r in existing_results}
+            
+            if already_checked:
+                print(f"\n💾 Found {len(already_checked)} already-checked papers in cache")
+                papers_to_check = [pid for pid in paper_ids if pid not in already_checked]
+                skipped = len(paper_ids) - len(papers_to_check)
+                
+                if skipped > 0:
+                    print(f"   ⏭️  Skipping {skipped} cached papers: {', '.join([p for p in paper_ids if p in already_checked])}")
+                
+                if not papers_to_check:
+                    print(f"   ✓ All papers already checked! No new papers to process.")
+                    return 0
+                
+                paper_ids = papers_to_check
+                print(f"   🔄 Will check {len(paper_ids)} new papers: {', '.join(paper_ids)}")
+        except Exception as e:
+            print(f"   ⚠️  Could not load existing cache: {e}")
+
     # 3. Check for Endorsers
     print(f"\n🔍 Checking papers for endorsers (Browser visible: {not args.headless})...")
+    
+    # Create callback to save results incrementally
+    new_results = []
+    
+    async def save_result_callback(result, idx, total):
+        """Save results after each paper is checked."""
+        new_results.append(result)
+        
+        # Merge with existing results and save
+        all_results = existing_results + new_results
+        check_data = {
+            "category": args.category,
+            "papers_scanned": len(all_results),
+            "results": all_results
+        }
+        
+        with open(args.output, 'w') as f:
+            json.dump(check_data, f, indent=2)
+        
+        print(f"  💾 Saved progress: {len(all_results)} total papers in cache", file=sys.stderr)
     
     async with async_playwright() as p:
         # Launch browser (headless=False by default to satisfy 'REAL browsing' request unless flag set)
         browser = await p.chromium.launch(headless=args.headless)
         
         try:
-            results = await check_papers_batch(browser, paper_ids, username, password)
+            results = await check_papers_batch(browser, paper_ids, username, password, args.delay, save_result_callback)
             
             # 4. Report Results
             print("\n📊 SEARCH RESULTS")
@@ -74,13 +123,7 @@ async def main():
             found_count = 0
             all_endorsers = set()
             
-            check_data = {
-                "category": args.category,
-                "papers_scanned": len(paper_ids),
-                "results": results
-            }
-            
-            for res in results:
+            for res in new_results:
                 eid = res.get('arxiv_id')
                 endorsers = res.get('endorsers', [])
                 if endorsers:
@@ -98,14 +141,12 @@ async def main():
             
             print("\n" + "-" * 60)
             print(f"Summary:")
-            print(f"  Papers Checked: {len(results)}")
-            print(f"  Papers with Endorsers: {found_count}")
-            print(f"  Unique Endorsers Found: {len(all_endorsers)}")
+            print(f"  Papers Checked (this run): {len(new_results)}")
+            print(f"  Total Papers in Cache: {len(existing_results) + len(new_results)}")
+            print(f"  Papers with Endorsers (this run): {found_count}")
+            print(f"  Unique Endorsers Found (this run): {len(all_endorsers)}")
             
-            # Save JSON
-            with open(args.output, 'w') as f:
-                json.dump(check_data, f, indent=2)
-            print(f"\n💾 Results saved to {args.output}")
+            print(f"\n✅ All results saved incrementally to {args.output}")
             
         finally:
             await browser.close()

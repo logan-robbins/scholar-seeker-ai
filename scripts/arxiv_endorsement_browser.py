@@ -46,82 +46,44 @@ async def check_paper_endorsements(
     arxiv_id: str,
 ) -> Optional[Dict[str, object]]:
     """
-    Navigate to a paper and extract endorsement information.
+    Navigate directly to the endorsers page and extract eligible endorsers.
     
     Returns dict with:
         - arxiv_id: str
-        - authors: List[str]
-        - endorsers: List[str]  (subset of authors who can endorse)
+        - endorsers: List[str]  (authors who can endorse)
         - check_timestamp: str
         - raw_html: str (for debugging)
+        - error: str (optional, if there was an error)
     """
-    paper_url = f"https://arxiv.org/abs/{arxiv_id}"
+    # Navigate directly to the endorsers page (requires authentication)
+    endorsers_url = f"https://arxiv.org/auth/show-endorsers/{arxiv_id}"
     print(f"  Checking {arxiv_id}...", file=sys.stderr)
     
     try:
-        # Navigate to paper page
-        await page.goto(paper_url, wait_until="networkidle")
+        await page.goto(endorsers_url, wait_until="networkidle")
         
-        # Extract authors from the paper page first
-        authors = []
-        try:
-            author_elements = await page.query_selector_all('.authors a')
-            for elem in author_elements:
-                author_name = await elem.inner_text()
-                if author_name:
-                    authors.append(author_name.strip())
-        except Exception as e:
-            print(f"    Warning: Could not extract authors: {e}", file=sys.stderr)
-        
-        # Look for the endorsers link
-        # Try multiple selectors
-        endorsers_link = await page.query_selector('a[href*="show-endorsers"]')
-        if not endorsers_link:
-            # Try finding by text if href selector fails
-            try:
-                endorsers_link = await page.get_by_text("Which authors of this paper are endorsers?", exact=False).first.element_handle()
-            except:
-                pass
-        
-        if not endorsers_link:
-            print(f"    No endorsers link found (paper may be too new)", file=sys.stderr)
-            return {
-                "arxiv_id": arxiv_id,
-                "authors": authors,
-                "endorsers": [],
-                "check_timestamp": datetime.now(timezone.utc).isoformat(),
-                "raw_html": "",
-                "error": "No endorsers link found",
-            }
-        
-        # Click the endorsers link
-        await endorsers_link.click()
-        await page.wait_for_load_state("networkidle")
-        
-        # Check if we got a 404 or error page
+        # Check if we got a 404, error, or login page
         page_title = await page.title()
-        if "not found" in page_title.lower() or "error" in page_title.lower():
-            print(f"    Endorsers page not available", file=sys.stderr)
+        if any(x in page_title.lower() for x in ["not found", "error", "log in"]):
+            print(f"    Endorsers page not available: {page_title}", file=sys.stderr)
             return {
                 "arxiv_id": arxiv_id,
-                "authors": authors,
                 "endorsers": [],
                 "check_timestamp": datetime.now(timezone.utc).isoformat(),
                 "raw_html": await page.content(),
-                "error": "Endorsers page not found",
+                "error": f"Endorsers page not accessible: {page_title}",
             }
         
         # Extract endorsement information
         page_content = await page.content()
         
         # Parse the endorsers page
-        endorsers = await extract_endorsers_from_page(page, authors)
+        endorsers = await extract_endorsers_from_page(page)
         
-        print(f"    Found {len(endorsers)}/{len(authors)} endorsers", file=sys.stderr)
+        print(f"    Found {len(endorsers)} endorsers", file=sys.stderr)
         
         return {
             "arxiv_id": arxiv_id,
-            "authors": authors,
             "endorsers": endorsers,
             "check_timestamp": datetime.now(timezone.utc).isoformat(),
             "raw_html": page_content,
@@ -131,7 +93,6 @@ async def check_paper_endorsements(
         print(f"    Error checking paper: {e}", file=sys.stderr)
         return {
             "arxiv_id": arxiv_id,
-            "authors": authors if 'authors' in locals() else [],
             "endorsers": [],
             "check_timestamp": datetime.now(timezone.utc).isoformat(),
             "raw_html": "",
@@ -139,32 +100,25 @@ async def check_paper_endorsements(
         }
 
 
-async def extract_endorsers_from_page(page: Page, known_authors: List[str]) -> List[str]:
-    """Extract the list of endorsers from the endorsers page."""
+async def extract_endorsers_from_page(page: Page) -> List[str]:
+    """Extract only the endorsers from the endorsers page."""
     endorsers = []
     
     try:
-        # Strategy 1: Look for explicit "can endorse" text
-        page_text = await page.inner_text('body')
-        
-        for author in known_authors:
-            if author in page_text:
-                author_section = page_text[page_text.find(author):page_text.find(author)+200]
-                
-                if any(indicator in author_section.lower() for indicator in 
-                       ['yes', 'can endorse', 'eligible', '✓', '✔']):
-                    endorsers.append(author)
-        
-        # Strategy 2: Look for structured lists
-        list_items = await page.query_selector_all('li, tr')
-        for item in list_items:
-            item_text = await item.inner_text()
-            for author in known_authors:
-                if author in item_text:
-                    if any(indicator in item_text.lower() for indicator in 
-                           ['yes', 'can endorse', 'eligible', '✓', '✔']):
-                        if author not in endorsers:
-                            endorsers.append(author)
+        # Extract endorsers from the table rows
+        # Look for rows containing "Can endorse for"
+        table_rows = await page.query_selector_all('table tr')
+        for row in table_rows:
+            row_text = await row.inner_text()
+            
+            # Check if this row indicates an endorser
+            if 'can endorse' in row_text.lower():
+                # Extract the author name (in bold, followed by colon)
+                bold_elements = await row.query_selector_all('b')
+                for bold in bold_elements:
+                    author_name = (await bold.inner_text()).strip().rstrip(':')
+                    if author_name and author_name not in endorsers:
+                        endorsers.append(author_name)
     
     except Exception as e:
         print(f"    Warning: Error extracting endorsers: {e}", file=sys.stderr)
@@ -177,8 +131,19 @@ async def check_papers_batch(
     paper_ids: List[str],
     username: str,
     password: str,
+    delay_seconds: int = DEFAULT_DELAY_SECONDS,
+    result_callback=None,
 ) -> List[Dict[str, object]]:
-    """Check endorsements for a batch of papers with rate limiting."""
+    """Check endorsements for a batch of papers with rate limiting.
+    
+    Args:
+        browser: Playwright browser instance
+        paper_ids: List of arXiv paper IDs to check
+        username: arXiv username
+        password: arXiv password
+        delay_seconds: Seconds to wait between papers
+        result_callback: Optional callback function called after each paper with (result, idx, total)
+    """
     results = []
     
     # Use auth manager to get authenticated context
@@ -210,11 +175,15 @@ async def check_papers_batch(
         result = await check_paper_endorsements(page, paper_id)
         if result:
             results.append(result)
+            
+            # Call callback after each paper if provided
+            if result_callback:
+                await result_callback(result, idx, len(paper_ids))
         
         # Rate limiting - wait between papers (except for last one)
         if idx < len(paper_ids):
-            print(f"  Waiting {DEFAULT_DELAY_SECONDS} seconds before next paper...", file=sys.stderr)
-            await asyncio.sleep(DEFAULT_DELAY_SECONDS)
+            print(f"  Waiting {delay_seconds} seconds before next paper...", file=sys.stderr)
+            await asyncio.sleep(delay_seconds)
     
     await context.close()
     return results
