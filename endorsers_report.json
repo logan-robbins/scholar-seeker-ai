@@ -1,0 +1,55 @@
+{
+  "category": "cs.AI",
+  "papers_scanned": 3,
+  "results": [
+    {
+      "arxiv_id": "2512.07810",
+      "authors": [
+        "Jordan Taylor",
+        "Sid Black",
+        "Dillon Bowen",
+        "Thomas Read",
+        "Satvik Golechha",
+        "Alex Zelenka-Martin",
+        "Oliver Makins",
+        "Connor Kissane",
+        "Kola Ayonrinde",
+        "Jacob Merizian",
+        "Samuel Marks",
+        "Chris Cundy",
+        "Joseph Bloom"
+      ],
+      "endorsers": [
+        "Jordan Taylor",
+        "Satvik Golechha"
+      ],
+      "check_timestamp": "2025-12-09T21:43:43.839119+00:00",
+      "raw_html": "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\"><html><head>\n<title>Satvik Golechha is qualified to endorse.</title>\n<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\" href=\"/css/arXiv.css\"><link rel=\"shortcut icon\" href=\"/favicon.ico\" type=\"image/x-icon\"></head>\n\n<body id=\"front\" class=\"with-cu-identity\">\n<div id=\"cu-identity\">\n<div id=\"cu-logo\">\n<a href=\"https://www.cornell.edu/\"><img src=\"//static.arxiv.org/icons/cu/cornell-reduced-white-SMALL.svg\" alt=\"Cornell University\" width=\"200\" border=\"0\"></a>\n</div>\n<div id=\"support-ack\">\n<a href=\"https://confluence.cornell.edu/x/ALlRF\">We gratefully acknowledge support from<br> the Simons Foundation and member institutions.</a>\n</div>\n</div>\n<div id=\"header\">\n<h1><a href=\"/\">arXiv.org</a></h1>\n</div>\n<div id=\"content\">\n<h1>Satvik Golechha is qualified to endorse.</h1>\n<h2>Auditing Games for Sandbagging</h2>\n\n<table>\n       <tbody><tr>\n       <td valign=\"top\"><b>Jordan Taylor:</b></td>\n       <td valign=\"top\">Is registered as an author of this paper.<br>Not currently an endorser. (<a href=\"/help/endorsement\">why?</a>)</td>\n     </tr>\n              <tr>\n       <td valign=\"top\"><b>Satvik Golechha:</b></td>\n       <td valign=\"top\">Is registered as an author of this paper.<br>Can endorse for <b>cs.AI, cs.LG</b>. (<a href=\"/help/endorsement\">why?</a>)</td>\n     </tr>\n             </tbody></table>\n<p>\n<b>Sid Black</b>, <b>Dillon Bowen</b>, <b>Thomas Read</b>, <b>Alex Zelenka-Martin</b>, <b>Oliver Makins</b>, <b>Connor Kissane</b>, <b>Kola Ayonrinde</b>, <b>Jacob Merizian</b>, <b>Samuel Marks</b>, <b>Chris Cundy</b> and <b>Joseph Bloom</b> are not registered as owners of this paper. (<a href=\"/help/not-registered.html\">why?</a>)</p>\n</div>\n\n<div id=\"footer\">\n<address>\n<a href=\"/help/contact\">Contact</a>\n</address>\n</div>\n\n\n\n</body></html>"
+    },
+    {
+      "arxiv_id": "2512.07796",
+      "authors": [
+        "Sridhar Mahadevan"
+      ],
+      "endorsers": [
+        "Sridhar Mahadevan"
+      ],
+      "check_timestamp": "2025-12-09T21:44:15.530164+00:00",
+      "raw_html": "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\"><html><head>\n<title>Sridhar Mahadevan is qualified to endorse.</title>\n<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\" href=\"/css/arXiv.css\"><link rel=\"shortcut icon\" href=\"/favicon.ico\" type=\"image/x-icon\"></head>\n\n<body id=\"front\" class=\"with-cu-identity\">\n<div id=\"cu-identity\">\n<div id=\"cu-logo\">\n<a href=\"https://www.cornell.edu/\"><img src=\"//static.arxiv.org/icons/cu/cornell-reduced-white-SMALL.svg\" alt=\"Cornell University\" width=\"200\" border=\"0\"></a>\n</div>\n<div id=\"support-ack\">\n<a href=\"https://confluence.cornell.edu/x/ALlRF\">We gratefully acknowledge support from<br> the Simons Foundation and member institutions.</a>\n</div>\n</div>\n<div id=\"header\">\n<h1><a href=\"/\">arXiv.org</a></h1>\n</div>\n<div id=\"content\">\n<h1>Sridhar Mahadevan is qualified to endorse.</h1>\n<h2>Large Causal Models from Large Language Models</h2>\n\n<table>\n       <tbody><tr>\n       <td valign=\"top\"><b>Sridhar Mahadevan:</b></td>\n       <td valign=\"top\">Is registered as an author of this paper.<br>Can endorse for <b>cs.LG, cs.AI, math.OC, math.AT, math.CT, cs.CL, cs.LO</b>. (<a href=\"/help/endorsement\">why?</a>)</td>\n     </tr>\n     </tbody></table>\n<p>\n</p>\n</div>\n\n<div id=\"footer\">\n<address>\n<a href=\"/help/contact\">Contact</a>\n</address>\n</div>\n\n\n\n</body></html>"
+    },
+    {
+      "arxiv_id": "2512.07795",
+      "authors": [
+        "Nearchos Potamitis",
+        "Lars Klein",
+        "Akhil Arora"
+      ],
+      "endorsers": [
+        "Nearchos Potamitis",
+        "Akhil Arora"
+      ],
+      "check_timestamp": "2025-12-09T21:44:47.191697+00:00",
+      "raw_html": "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\"><html><head>\n<title>Akhil Arora is qualified to endorse.</title>\n<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\" href=\"/css/arXiv.css\"><link rel=\"shortcut icon\" href=\"/favicon.ico\" type=\"image/x-icon\"></head>\n\n<body id=\"front\" class=\"with-cu-identity\">\n<div id=\"cu-identity\">\n<div id=\"cu-logo\">\n<a href=\"https://www.cornell.edu/\"><img src=\"//static.arxiv.org/icons/cu/cornell-reduced-white-SMALL.svg\" alt=\"Cornell University\" width=\"200\" border=\"0\"></a>\n</div>\n<div id=\"support-ack\">\n<a href=\"https://confluence.cornell.edu/x/ALlRF\">We gratefully acknowledge support from<br> the Simons Foundation and member institutions.</a>\n</div>\n</div>\n<div id=\"header\">\n<h1><a href=\"/\">arXiv.org</a></h1>\n</div>\n<div id=\"content\">\n<h1>Akhil Arora is qualified to endorse.</h1>\n<h2>ReasonBENCH: Benchmarking the (In)Stability of LLM Reasoning</h2>\n\n<table>\n       <tbody><tr>\n       <td valign=\"top\"><b>Nearchos Potamitis:</b></td>\n       <td valign=\"top\">Is registered as an author of this paper.<br>Not currently an endorser. (<a href=\"/help/endorsement\">why?</a>)</td>\n     </tr>\n            <tr>\n       <td valign=\"top\"><b>Akhil Arora:</b></td>\n       <td valign=\"top\">Is registered as an author of this paper.<br>Can endorse for <b>cs.DB, cs.SI, cs.CL, cs.IR, cs.CY, cs.AI</b>. (<a href=\"/help/endorsement\">why?</a>)</td>\n     </tr>\n     </tbody></table>\n<p>\n<b>Lars Klein</b> is not registered as an owner of this paper. (<a href=\"/help/not-registered.html\">why?</a>)</p>\n</div>\n\n<div id=\"footer\">\n<address>\n<a href=\"/help/contact\">Contact</a>\n</address>\n</div>\n\n\n\n</body></html>"
+    }
+  ]
+}
