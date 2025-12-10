@@ -46,7 +46,8 @@ Run the automated scout to find endorsers in `cs.AI` (or any other category):
 
 ```bash
 # Find endorsers from the last 10 papers in cs.AI
-uv run python scripts/run_endorser_search.py --category cs.AI --limit 10
+# Recommended: Use --delay 15 to respect arXiv rate limits
+uv run python scripts/run_endorser_search.py --category cs.AI --limit 10 --delay 15
 ```
 
 ### Options

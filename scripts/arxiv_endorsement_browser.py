@@ -38,7 +38,7 @@ env_path = script_dir.parent / ".env"
 if env_path.exists():
     load_dotenv(env_path)
 
-DEFAULT_DELAY_SECONDS = 30
+DEFAULT_DELAY_SECONDS = 15
 
 
 async def check_paper_endorsements(

@@ -33,16 +33,16 @@ async def fetch_recent_papers(category: str = "cs.AI", limit: int = 20, skip_ids
         
         # arXiv recent page supports pagination with ?skip=X&show=Y
         # Valid show values: 25, 50, 100, 250
-        # Using 100 to be more respectful of arXiv's servers
+        # Using 50 to be very respectful of arXiv's servers
         skip = 0
-        show_per_page = 100
+        show_per_page = 50
         page_num = 0
         
         while len(paper_ids) < limit:
-            # Rate limiting: 5 second delay before each request (except first)
+            # Rate limiting: 10 second delay before each request (except first)
             if page_num > 0:
-                print(f"  Waiting 5 seconds before next page...", file=sys.stderr)
-                await asyncio.sleep(5)
+                print(f"  Waiting 10 seconds before next page...", file=sys.stderr)
+                await asyncio.sleep(10)
             
             url = f"https://arxiv.org/list/{category}/recent?skip={skip}&show={show_per_page}"
             print(f"Fetching from {url}...", file=sys.stderr)
