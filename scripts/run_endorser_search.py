@@ -45,20 +45,7 @@ async def main():
     print(f"🚀 Starting Endorser Search for category: {args.category}")
     print("-" * 60)
 
-    # 2. Fetch Recent Papers
-    print(f"\n📡 Fetching {args.limit} recent papers from {args.category}...")
-    try:
-        paper_ids = await fetch_recent_papers(args.category, args.limit)
-        print(f"✓ Found {len(paper_ids)} papers: {', '.join(paper_ids)}")
-    except Exception as e:
-        print(f"✗ Error fetching papers: {e}")
-        return 1
-
-    if not paper_ids:
-        print("No papers found.")
-        return 0
-
-    # 2.5. Load existing results and filter out already-checked papers
+    # 2. Load existing results to know which papers to skip
     existing_results = []
     already_checked = set()
     
@@ -71,23 +58,24 @@ async def main():
             
             if already_checked:
                 print(f"\n💾 Found {len(already_checked)} already-checked papers in cache")
-                papers_to_check = [pid for pid in paper_ids if pid not in already_checked]
-                skipped = len(paper_ids) - len(papers_to_check)
-                
-                if skipped > 0:
-                    print(f"   ⏭️  Skipping {skipped} cached papers: {', '.join([p for p in paper_ids if p in already_checked])}")
-                
-                if not papers_to_check:
-                    print(f"   ✓ All papers already checked! No new papers to process.")
-                    return 0
-                
-                paper_ids = papers_to_check
-                print(f"   🔄 Will check {len(paper_ids)} new papers: {', '.join(paper_ids)}")
         except Exception as e:
             print(f"   ⚠️  Could not load existing cache: {e}")
+    
+    # 3. Fetch Recent Papers (skipping already-cached ones)
+    print(f"\n📡 Fetching {args.limit} NEW papers from {args.category} (skipping {len(already_checked)} cached)...")
+    try:
+        paper_ids = await fetch_recent_papers(args.category, args.limit, skip_ids=list(already_checked))
+        print(f"✓ Found {len(paper_ids)} NEW papers: {', '.join(paper_ids)}")
+    except Exception as e:
+        print(f"✗ Error fetching papers: {e}")
+        return 1
 
-    # 3. Check for Endorsers
-    print(f"\n🔍 Checking papers for endorsers (Browser visible: {not args.headless})...")
+    if not paper_ids:
+        print("No new papers to process.")
+        return 0
+
+    # 5. Check for Endorsers
+    print(f"\n🔍 Checking {len(paper_ids)} papers for endorsers (Browser visible: {not args.headless})...")
     
     # Create callback to save results incrementally
     new_results = []
@@ -116,7 +104,7 @@ async def main():
         try:
             results = await check_papers_batch(browser, paper_ids, username, password, args.delay, save_result_callback)
             
-            # 4. Report Results
+            # 6. Report Results
             print("\n📊 SEARCH RESULTS")
             print("=" * 60)
             
