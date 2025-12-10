@@ -34,9 +34,13 @@ async def fetch_recent_papers(category: str = "cs.AI", limit: int = 20, skip_ids
         # arXiv recent page supports pagination with ?skip=X&show=Y
         # Valid show values: 25, 50, 100, 250
         # Using 50 to be very respectful of arXiv's servers
-        skip = 0
+        # Start skip at number of papers we're skipping to avoid fetching them at all
+        skip = len(skip_ids_set)
         show_per_page = 50
         page_num = 0
+        
+        if skip > 0:
+            print(f"  Starting fetch at skip={skip} (skipping {skip} cached papers)", file=sys.stderr)
         
         while len(paper_ids) < limit:
             # Rate limiting: 10 second delay before each request (except first)
